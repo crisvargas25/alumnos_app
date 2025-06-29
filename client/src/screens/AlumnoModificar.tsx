@@ -58,42 +58,42 @@ function AlumnoModificar() {
             return;
         }
         try {
-            const response = await axios.get(`http://localhost:5000/alumnos/${buscarMatricula}`);
+            const response = await axios.get(`http://localhost:5000/alumnos/getStudent/${buscarMatricula}`);
             console.log(response.data);
 
-            if (response.data && response.data.results && response.data.results.length > 0) {
-                const datos = response.data.results[0];
+            if (response.data && response.data.data) {
+                const datos = response.data.data;
                 const alumnoData: alumnosEstructura = {
                     matricula: datos.matricula,
                     nombre: datos.nombre,
-                    APaterno: datos.aPaterno,
-                    MPaterno: datos.aMaterno,
+                    APaterno: datos.APaterno,
+                    MPaterno: datos.MPaterno,
                     sexo: String(datos.sexo),
-                    Telefono: datos.aTelefono,
-                    CorreoElectrnico: datos.aCorreo,
-                    PerfilFacebook: datos.aFacebook,
-                    Instagram: datos.aInstagram,
-                    TipoSangre: datos.tiposangre,
-                    Contraseña: datos.contrasenha,
+                    Telefono: datos.Telefono,
+                    CorreoElectrnico: datos.CorreoElectrnico,
+                    PerfilFacebook: datos.PerfilFacebook,
+                    Instagram: datos.Instagram,
+                    TipoSangre: datos.TipoSangre,
+                    Contraseña: datos.Contraseña,
                     dCalle: datos.dCalle,
-                    Numero: datos.dNumero,
-                    Colonia: datos.dColonia,
-                    CodigoPostal: datos.dCodigoPostal,
-                    dNombreContacto: datos.nombreContacto,
-                    TelefonoContacto: datos.telefonoContacto
-                }
+                    Numero: datos.Numero,
+                    Colonia: datos.Colonia,
+                    CodigoPostal: datos.CodigoPostal,
+                    dNombreContacto: datos.dNombreContacto,
+                    TelefonoContacto: datos.TelefonoContacto
+                };
                 setAlumno(alumnoData);
             } else {
                 Swal.fire("No encontrado", "No se encontró ningún alumno con esa matrícula", "error");
                 setAlumno(initialState);
             }
-
         } catch (error) {
             Swal.fire("Error", "No se pudo encontrar el alumno", "error");
             console.error(error);
             setAlumno(initialState);
         }
-    }
+    };
+
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         let { name, value } = event.target;

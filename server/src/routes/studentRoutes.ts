@@ -5,10 +5,10 @@ import { authMiddleware } from '../middleware/authMiddleware';
 const router = express.Router();
 
 router.post('/agregar', addStudent)
-router.post('/obtener', getAllStudents)
+router.get('/obtener', getAllStudents)
 router.get('/getStudent/:matricula', getStudentByMatricula)
-router.post('/agregar', searchStudentsByName)
-router.post('/agregar', updateStudent)
+router.post('/studentName', searchStudentsByName)
+router.put('/actualizar/:matricula', updateStudent)
 router.delete('/eliminar/:matricula', deleteStudent)
 
 

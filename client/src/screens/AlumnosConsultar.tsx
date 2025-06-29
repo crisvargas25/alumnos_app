@@ -14,15 +14,14 @@ import {
 interface Alumno {
   matricula: string;
   nombre: string;
-  aPaterno?: string;
-  aMaterno?: string;
-  sexo: number;
-  aCorreo?: string;
-  aTelefono?: string;
-  nombreContacto?: string;
-  telefonoContacto?: string;
-  tiposangre?: string;
-  // …otros campos
+  APaterno?: string;
+  MPaterno?: string;
+  sexo: string; // "1" o "0"
+  CorreoElectrnico?: string;
+  Telefono?: string;
+  dNombreContacto?: string;
+  TelefonoContacto?: string;
+  TipoSangre?: string;
 }
 
 function AlumnosConsultar() {
@@ -31,7 +30,6 @@ function AlumnosConsultar() {
   const [showModal, setShowModal] = useState(false);
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState<Alumno | null>(null);
 
-  // **Estados de búsqueda y filtros**
   const [buscar, setBuscar] = useState("");
   const [filtroSexo, setFiltroSexo] = useState<"" | "1" | "0">("");
   const [filtroSangre, setFiltroSangre] = useState<string>("");
@@ -42,8 +40,9 @@ function AlumnosConsultar() {
 
   const fetchAlumnos = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/alumnos");
-      setAlumnos(Array.isArray(data.results) ? data.results : []);
+      const { data } = await axios.get("http://localhost:5000/alumnos/obtener");
+      console.log(data.result);
+      setAlumnos(Array.isArray(data.result) ? data.result : []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -53,39 +52,36 @@ function AlumnosConsultar() {
 
   const alumnoConsultar = async (matricula: string) => {
     try {
-      const { data } = await axios.get(`http://localhost:5000/alumnos/${matricula}`);
-      const alumno = data.result || data.results?.[0];
+      const { data } = await axios.get(`http://localhost:5000/alumnos/getStudent/${matricula}`);
+      const alumno = data.data;
       if (alumno) {
         setAlumnoSeleccionado(alumno);
         setShowModal(true);
+      } else {
+        console.warn("Alumno no encontrado");
       }
     } catch (err) {
-      console.error(err);
+      console.error("Error al consultar el alumno:", err);
     }
   };
 
-  // **Filtrado y búsqueda en memoria (useMemo para rendimiento)**
   const alumnosFiltrados = useMemo(() => {
     return alumnos
       .filter((a) => {
-        // filtro por texto en matrícula o nombre (case-insensitive)
         const texto = buscar.toLowerCase();
         if (texto) {
           const hayEnMat = a.matricula.toLowerCase().includes(texto);
           const hayEnNom = a.nombre.toLowerCase().includes(texto);
           if (!hayEnMat && !hayEnNom) return false;
         }
-        // filtro por sexo
-        if (filtroSexo !== "" && String(a.sexo) !== filtroSexo) {
-          return false;
-        }
-        // filtro por tipo de sangre
-        if (filtroSangre && a.tiposangre !== filtroSangre) {
-          return false;
-        }
+
+        if (filtroSexo !== "" && a.sexo !== filtroSexo) return false;
+
+        if (filtroSangre && a.TipoSangre !== filtroSangre) return false;
+
         return true;
       })
-      .slice(0, 200); // opcional: límite para no renderizar miles
+      .slice(0, 200);
   }, [alumnos, buscar, filtroSexo, filtroSangre]);
 
   const handleCloseModal = () => {
@@ -101,7 +97,6 @@ function AlumnosConsultar() {
         <p>Cargando...</p>
       ) : (
         <>
-          {/* ===== Controles de búsqueda y filtros ===== */}
           <Row className="mb-3 g-2">
             <Col md={6}>
               <InputGroup>
@@ -121,8 +116,8 @@ function AlumnosConsultar() {
                 onChange={(e) => setFiltroSexo(e.target.value as "" | "1" | "0")}
               >
                 <option value="">Todos los sexos</option>
-                <option value="1">Femenino</option>
-                <option value="0">Masculino</option>
+                <option value="1">Masculino</option>
+                <option value="0">Femenino</option>
               </Form.Select>
             </Col>
             <Col md={3}>
@@ -143,7 +138,6 @@ function AlumnosConsultar() {
             </Col>
           </Row>
 
-          {/* ===== Tabla de resultados ===== */}
           <div style={{ overflowX: "auto" }}>
             <Table striped bordered hover responsive>
               <thead>
@@ -164,11 +158,11 @@ function AlumnosConsultar() {
                     <tr key={a.matricula}>
                       <td>{i + 1}</td>
                       <td>{a.matricula}</td>
-                      <td>{a.nombre}</td>
-                      <td>{a.aCorreo}</td>
-                      <td>{a.aTelefono}</td>
-                      <td>{a.sexo === 1 ? "Femenino" : "Masculino"}</td>
-                      <td>{a.tiposangre}</td>
+                      <td>{`${a.nombre} ${a.APaterno || ""} ${a.MPaterno || ""}`}</td>
+                      <td>{a.CorreoElectrnico}</td>
+                      <td>{a.Telefono}</td>
+                      <td>{a.sexo === "1" ? "Masculino" : "Femenino"}</td>
+                      <td>{a.TipoSangre}</td>
                       <td>
                         <Button variant="primary" onClick={() => alumnoConsultar(a.matricula)}>
                           Consultar
@@ -189,11 +183,10 @@ function AlumnosConsultar() {
         </>
       )}
 
-      {/* ===== Modal de detalle ===== */}
       <Modal show={showModal} onHide={handleCloseModal} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>
-            {alumnoSeleccionado && `Detalle: ${alumnoSeleccionado.matricula}`}
+            {alumnoSeleccionado && `Matricula: ${alumnoSeleccionado.matricula}`}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -201,17 +194,16 @@ function AlumnosConsultar() {
             <Row>
               <Col md={6}>
                 <p><strong>Nombre:</strong> {alumnoSeleccionado.nombre}</p>
-                <p><strong>Apellido Paterno:</strong> {alumnoSeleccionado.aPaterno}</p>
-                <p><strong>Apellido Materno:</strong> {alumnoSeleccionado.aMaterno}</p>
-                <p><strong>Correo:</strong> {alumnoSeleccionado.aCorreo}</p>
-                <p><strong>Teléfono:</strong> {alumnoSeleccionado.aTelefono}</p>
+                <p><strong>Apellido Paterno:</strong> {alumnoSeleccionado.APaterno}</p>
+                <p><strong>Apellido Materno:</strong> {alumnoSeleccionado.MPaterno}</p>
+                <p><strong>Correo:</strong> {alumnoSeleccionado.CorreoElectrnico}</p>
+                <p><strong>Teléfono:</strong> {alumnoSeleccionado.Telefono}</p>
               </Col>
               <Col md={6}>
-                <p><strong>Sexo:</strong> {alumnoSeleccionado.sexo === 1 ? "Femenino" : "Masculino"}</p>
-                <p><strong>Tipo de Sangre:</strong> {alumnoSeleccionado.tiposangre}</p>
-                <p><strong>Contacto:</strong> {alumnoSeleccionado.nombreContacto}</p>
-                <p><strong>Teléfono Contacto:</strong> {alumnoSeleccionado.telefonoContacto}</p>
-                {/* Agrega aquí más campos si los necesitas */}
+                <p><strong>Sexo:</strong> {alumnoSeleccionado.sexo === "1" ? "Masculino" : "Femenino"}</p>
+                <p><strong>Tipo de Sangre:</strong> {alumnoSeleccionado.TipoSangre}</p>
+                <p><strong>Contacto:</strong> {alumnoSeleccionado.dNombreContacto}</p>
+                <p><strong>Teléfono Contacto:</strong> {alumnoSeleccionado.TelefonoContacto}</p>
               </Col>
             </Row>
           )}

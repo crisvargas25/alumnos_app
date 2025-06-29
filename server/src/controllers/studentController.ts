@@ -78,26 +78,47 @@ export const searchStudentsByName = async (req: Request, res: Response) => {
 };
 
 
-
 export const updateStudent = async (req: Request, res: Response) => {
   try {
-    const { matricula, ...updates } = req.body;
+    const { matricula } = req.params;
+    const updates = { ...req.body };
 
     if (!matricula) {
-      return res.status(400).json({ status: 400, message: 'La matrícula es obligatoria para modificar al alumno.' });
+      return res.status(400).json({
+        status: 400,
+        message: "La matrícula es obligatoria para modificar al alumno.",
+      });
     }
 
-    const updated = await Student.findOneAndUpdate({ matricula }, updates, { new: true });
+    // Verificar si se está enviando una nueva contraseña
+    if (updates.Contraseña) {
+      // Encriptar la nueva contraseña antes de guardarla
+      const saltRounds = 10;
+      updates.Contraseña = await bcrypt.hash(updates.Contraseña, saltRounds);
+    }
+
+    const updated = await Student.findOneAndUpdate({ matricula }, updates, {
+      new: true,
+    });
 
     if (!updated) {
-      return res.status(404).json({ status: 404, message: 'Alumno no encontrado.' });
+      return res
+        .status(404)
+        .json({ status: 404, message: "Alumno no encontrado." });
     }
 
-    res.status(200).json({ status: 200, message: 'Alumno modificado correctamente.', result: updated });
+    res.status(200).json({
+      status: 200,
+      message: "Alumno modificado correctamente.",
+      result: updated,
+    });
   } catch (error) {
-    res.status(500).json({ status: 500, message: 'Error al modificar el alumno.', error });
+    res
+      .status(500)
+      .json({ status: 500, message: "Error al modificar el alumno.", error });
   }
 };
+
 
 
 

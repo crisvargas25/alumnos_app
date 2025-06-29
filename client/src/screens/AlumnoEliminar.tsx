@@ -20,9 +20,9 @@ function AlumnoEliminar() {
         }
 
         try {
-            const response = await axios.get(`http://localhost:5000/alumnos/${matricula}`);
-            if (response.data && response.data.results && response.data.results.length > 0) {
-                setAlumno(response.data.results[0]);
+            const response = await axios.get(`http://localhost:5000/alumnos/getStudent/${matricula}`);
+            if (response.data && response.data.data) {
+                setAlumno(response.data.data);
             } else {
                 Swal.fire("No encontrado", "No se encontró el alumno", "warning");
                 setAlumno(null);
@@ -46,7 +46,7 @@ function AlumnoEliminar() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const response = await axios.delete(`http://localhost:5000/alumnos/eliminar/${matricula}`);
+                    await axios.delete(`http://localhost:5000/alumnos/eliminar/${matricula}`);
                     Swal.fire("Eliminado", "El alumno ha sido eliminado", "success");
                     setAlumno(null);
                     setMatricula("");
@@ -67,7 +67,12 @@ function AlumnoEliminar() {
             <h1>Eliminar Alumno</h1>
             <Form onSubmit={buscarAlumno}>
                 <FloatingLabel label="Matrícula" className="mb-3">
-                    <Form.Control type="text" placeholder="Matrícula" value={matricula} onChange={handleInputChange} />
+                    <Form.Control
+                        type="text"
+                        placeholder="Matrícula"
+                        value={matricula}
+                        onChange={handleInputChange}
+                    />
                 </FloatingLabel>
                 <Button variant="primary" type="submit">Buscar</Button>
             </Form>
@@ -77,15 +82,15 @@ function AlumnoEliminar() {
                     <Card.Body>
                         <Card.Title>Alumno Encontrado</Card.Title>
                         <Row>
-                            <Col><strong>Nombre:</strong> {`${alumno.nombre} ${alumno.aPaterno} ${alumno.aMaterno}`}</Col>
+                            <Col><strong>Nombre:</strong> {`${alumno.nombre} ${alumno.APaterno} ${alumno.MPaterno}`}</Col>
                         </Row>
                         <Row>
-                            <Col><strong>Teléfono:</strong> {alumno.aTelefono}</Col>
-                            <Col><strong>Correo:</strong> {alumno.aCorreo}</Col>
+                            <Col><strong>Teléfono:</strong> {alumno.Telefono}</Col>
+                            <Col><strong>Correo:</strong> {alumno.CorreoElectrnico}</Col>
                         </Row>
                         <Row>
-                            <Col><strong>Nombre Contacto:</strong> {alumno.nombreContacto}</Col>
-                            <Col><strong>Tel. Contacto:</strong> {alumno.telefonoContacto}</Col>
+                            <Col><strong>Nombre Contacto:</strong> {alumno.dNombreContacto}</Col>
+                            <Col><strong>Tel. Contacto:</strong> {alumno.TelefonoContacto}</Col>
                         </Row>
 
                         <div className="mt-3 d-flex justify-content-end">

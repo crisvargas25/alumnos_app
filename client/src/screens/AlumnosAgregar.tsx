@@ -58,6 +58,8 @@ function AlumnosAgregar() {
     }
 
     const addAlumno = async (datos:alumnosEstructura) => {
+        console.log(datos);
+        
         const response = await axios.post(
             "http://localhost:5000/alumnos/agregar", 
             datos

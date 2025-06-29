@@ -14,7 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
-app.use('/api/students', studentRoutes);
+app.use('/alumnos', studentRoutes);
 app.use('/api/messages', messageRoutes);
 
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/alumnos')

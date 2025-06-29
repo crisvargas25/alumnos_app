@@ -7,6 +7,7 @@
     import AlumnoEliminar from "../screens/AlumnoEliminar.tsx";
     import NotFound from "../screens/NotFound.tsx";
     import PrivateRoute from "./PrivateRoute.tsx";
+import ContenidoA from "../screens/ContenidoA.tsx";
 
     export default function AppRouter() {
     return (
@@ -22,10 +23,11 @@
                 </PrivateRoute>
             }
             >
-            <Route path="agregar" element={<AlumnosAgregar />} />
-            <Route path="consultar" element={<AlumnosConsultar />} />
-            <Route path="modificar/:id" element={<AlumnoModificar />} />
-            <Route path="eliminar/:id" element={<AlumnoEliminar />} />
+            <Route path="alumnos" element={<ContenidoA />} />
+            <Route path="alumnos/agregar" element={<AlumnosAgregar />} />
+            <Route path="alumnos/consultar" element={<AlumnosConsultar />} />
+            <Route path="alumnos/modificar" element={<AlumnoModificar />} />
+            <Route path="alumnos/eliminar" element={<AlumnoEliminar />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

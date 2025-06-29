@@ -1,4 +1,6 @@
     import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+    
+
     import Login from "../screens/Login.tsx";
     import Menu from "../screens/Menu.tsx";
     import AlumnosAgregar from "../screens/AlumnosAgregar.tsx";
@@ -7,6 +9,7 @@
     import AlumnoEliminar from "../screens/AlumnoEliminar.tsx";
     import NotFound from "../screens/NotFound.tsx";
     import PrivateRoute from "./PrivateRoute.tsx";
+    import Error505 from "../screens/505error.tsx";
 import ContenidoA from "../screens/ContenidoA.tsx";
 
     export default function AppRouter() {
@@ -29,7 +32,7 @@ import ContenidoA from "../screens/ContenidoA.tsx";
             <Route path="alumnos/modificar" element={<AlumnoModificar />} />
             <Route path="alumnos/eliminar" element={<AlumnoEliminar />} />
             </Route>
-
+            <Route path="/505" element={<Error505 />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
         </BrowserRouter>

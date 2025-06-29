@@ -1,16 +1,15 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import LoginComponent from "../components/login-component.tsx"
+import LoginComponent from "../components/login-component.tsx";
+import { GoogleLogin } from '@react-oauth/google';
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const handleLogin = (credentials: { email: string; password: string }) => {
-    console.log("Login credentials:", credentials);
-    // Aquí irá la lógica del backend
-  };
+  const navigate = useNavigate();
 
-  const handleGoogleLogin = () => {
-    console.log("Google login initiated");
-    // Aquí irá la lógica de OAuth
+  const handleLogin = (credentials: { email: string; password: string; captchaToken: string }) => {
+    console.log("Login credentials:", credentials);
+    // Aquí puedes agregar la lógica para login normal si lo deseas.
   };
 
   return (
@@ -29,16 +28,47 @@ export default function Login() {
           <h2 className="mt-2">Iniciar Sesión</h2>
         </div>
 
-        <LoginComponent onLogin={handleLogin} onGoogleLogin={handleGoogleLogin} />
+        <LoginComponent onLogin={handleLogin} onGoogleLogin={() => { }} />
 
         <hr className="my-4" />
 
-        <button
-          className="btn btn-outline-danger w-100"
-          onClick={handleGoogleLogin}
-        >
-          <i className="bi bi-google me-2"></i> Iniciar con Google
-        </button>
+        <GoogleLogin
+          onSuccess={async (credentialResponse) => {
+            const token = credentialResponse?.credential;
+            console.log("Token decodificado:");
+
+
+            if (!token) {
+              alert("Token de Google no recibido");
+              return;
+            }
+
+            try {
+              // Puedes decodificarlo si quieres ver el contenido
+              console.log("Token decodificado:");
+
+              const res = await fetch("http://localhost:3001/api/auth/google-login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token }),
+              });
+
+              const data = await res.json();
+
+              if (res.ok) {
+                localStorage.setItem("token", data.token);
+                alert("Login con Google exitoso");
+                navigate("/");
+              } else {
+                alert(data.message || "Error al iniciar con Google");
+              }
+            } catch (err) {
+              console.error("Error al autenticar con Google:", err);
+              alert("Error al autenticar con Google");
+            }
+          }}
+          onError={() => alert("Fallo el inicio con Google")}
+        />
       </div>
     </div>
   );

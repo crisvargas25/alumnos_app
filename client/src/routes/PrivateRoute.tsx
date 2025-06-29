@@ -7,7 +7,7 @@ interface Props {
 
 
 // para probar las rutas priovadas sin necesidad de estar logewnadop
-const dev_mode = true
+const dev_mode = false
 
 export default function PrivateRoute({ children }: Props): JSX.Element {
   if (dev_mode) {

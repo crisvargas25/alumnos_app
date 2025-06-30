@@ -121,7 +121,7 @@ export default function Register() {
           <div className="mb-3">
             <label className="form-label">Año de inscripción</label>
             <input
-              type="number"
+              type="text"
               name="enrollmentYear"
               value={form.enrollmentYear}
               onChange={handleChange}
@@ -183,3 +183,4 @@ export default function Register() {
     </div>
   );
 }
+

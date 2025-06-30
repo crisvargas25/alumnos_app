@@ -10,6 +10,7 @@
     import NotFound from "../screens/NotFound.tsx";
     import PrivateRoute from "./PrivateRoute.tsx";
     import Error505 from "../screens/505error.tsx";
+    import MessagingPage from "../screens/Mensages.tsx";    
     import ContenidoA from "../screens/ContenidoA.tsx";
 
     export default function AppRouter() {
@@ -31,6 +32,8 @@
             <Route path="alumnos/consultar" element={<AlumnosConsultar />} />
             <Route path="alumnos/modificar" element={<AlumnoModificar />} />
             <Route path="alumnos/eliminar" element={<AlumnoEliminar />} />
+            <Route path="mensajes" element={<MessagingPage/>} />
+
             </Route>
             <Route path="/505" element={<Error505 />} />
             <Route path="*" element={<NotFound />} />

@@ -12,12 +12,15 @@
     import Error505 from "../screens/505error.tsx";
     import MessagingPage from "../screens/Mensages.tsx";    
     import ContenidoA from "../screens/ContenidoA.tsx";
+    import Register from "../screens/Register.tsx";
 
     export default function AppRouter() {
     return (
         <BrowserRouter>
         <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+
 
             <Route
             path="/"

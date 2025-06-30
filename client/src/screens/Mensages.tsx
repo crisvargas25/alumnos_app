@@ -15,6 +15,7 @@ import {
   Image,
   Modal,
 } from "react-bootstrap"
+import Swal from "sweetalert2"
 
 interface Email {
   id: string
@@ -187,25 +188,79 @@ export default function EmailSystem() {
 
   const selectedEmailData = emails.find((email) => email.id === selectedEmail)
 
-  const handleSendEmail = (e: React.FormEvent) => {
+  const handleSendEmail = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!composeForm.to.trim() || !composeForm.subject.trim() || !composeForm.content.trim()) return
-
-    const newEmail: Email = {
-      id: Date.now().toString(),
-      senderId: "current",
-      senderName: currentUser.name,
-      senderEmail: currentUser.email,
-      subject: composeForm.subject,
-      content: composeForm.content,
-      timestamp: new Date(),
-      status: "read",
-      priority: composeForm.priority,
-      hasAttachments: false,
+    if (!composeForm.to.trim() || !composeForm.subject.trim() || !composeForm.content.trim()) {
+      await Swal.fire({
+        icon: "warning",
+        title: "Incomplete Form",
+        text: "Please fill in all required fields (To, Subject, and Message)",
+        confirmButtonColor: "#0d6efd",
+      })
+      return
     }
 
-    setEmails([newEmail, ...emails])
-    setComposeForm({ to: "", subject: "", priority: "normal", content: "" })
+    // Show loading alert
+    Swal.fire({
+      title: "Sending Email...",
+      text: "Please wait while we send your email",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading()
+      },
+    })
+
+    // Simulate sending delay
+    setTimeout(async () => {
+      const newEmail: Email = {
+        id: Date.now().toString(),
+        senderId: "current",
+        senderName: currentUser.name,
+        senderEmail: currentUser.email,
+        subject: composeForm.subject,
+        content: composeForm.content,
+        timestamp: new Date(),
+        status: "read",
+        priority: composeForm.priority,
+        hasAttachments: false,
+      }
+
+      setEmails([newEmail, ...emails])
+      setComposeForm({ to: "", subject: "", priority: "normal", content: "" })
+      setShowComposeModal(false)
+
+      // Show success alert
+      await Swal.fire({
+        icon: "success",
+        title: "Email Sent!",
+        text: `Your email has been sent successfully to ${composeForm.to}`,
+        confirmButtonColor: "#198754",
+        timer: 3000,
+        timerProgressBar: true,
+      })
+    }, 2000)
+  }
+
+  const handleSaveDraft = async () => {
+    if (!composeForm.subject.trim() && !composeForm.content.trim()) {
+      await Swal.fire({
+        icon: "info",
+        title: "Empty Draft",
+        text: "Please add some content before saving as draft",
+        confirmButtonColor: "#0d6efd",
+      })
+      return
+    }
+
+    await Swal.fire({
+      icon: "success",
+      title: "Draft Saved!",
+      text: "Your email has been saved to drafts",
+      confirmButtonColor: "#198754",
+      timer: 2000,
+      timerProgressBar: true,
+    })
+
     setShowComposeModal(false)
   }
 
@@ -216,6 +271,194 @@ export default function EmailSystem() {
   const handleEmailSelect = (emailId: string) => {
     setSelectedEmail(emailId)
     markAsRead(emailId)
+  }
+
+  const handleDeleteEmail = async (emailId: string) => {
+    const email = emails.find((e) => e.id === emailId)
+    if (!email) return
+
+    const result = await Swal.fire({
+      title: "Delete Email?",
+      text: `Are you sure you want to delete "${email.subject}"? This action cannot be undone.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#dc3545",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    })
+
+    if (result.isConfirmed) {
+      setEmails(emails.filter((e) => e.id !== emailId))
+      if (selectedEmail === emailId) {
+        setSelectedEmail(null)
+      }
+
+      await Swal.fire({
+        icon: "success",
+        title: "Deleted!",
+        text: "The email has been moved to trash",
+        confirmButtonColor: "#198754",
+        timer: 2000,
+        timerProgressBar: true,
+      })
+    }
+  }
+
+  const handleArchiveEmail = async (emailId: string) => {
+    const email = emails.find((e) => e.id === emailId)
+    if (!email) return
+
+    await Swal.fire({
+      icon: "success",
+      title: "Email Archived!",
+      text: `"${email.subject}" has been moved to archive`,
+      confirmButtonColor: "#198754",
+      timer: 2000,
+      timerProgressBar: true,
+    })
+  }
+
+  const handleReplyEmail = async () => {
+    if (!selectedEmailData) return
+
+    const { value: replyText } = await Swal.fire({
+      title: `Reply to: ${selectedEmailData.subject}`,
+      input: "textarea",
+      inputLabel: "Your reply",
+      inputPlaceholder: "Type your reply here...",
+      inputAttributes: {
+        "aria-label": "Type your reply here",
+      },
+      showCancelButton: true,
+      confirmButtonText: "Send Reply",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#0d6efd",
+      inputValidator: (value) => {
+        if (!value) {
+          return "Please enter your reply message"
+        }
+      },
+    })
+
+    if (replyText) {
+      // Show sending animation
+      Swal.fire({
+        title: "Sending Reply...",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading()
+        },
+      })
+
+      setTimeout(async () => {
+        // Mark original email as replied
+        setEmails(
+          emails.map((email) => (email.id === selectedEmailData.id ? { ...email, status: "replied" as const } : email)),
+        )
+
+        await Swal.fire({
+          icon: "success",
+          title: "Reply Sent!",
+          text: `Your reply has been sent to ${selectedEmailData.senderEmail}`,
+          confirmButtonColor: "#198754",
+          timer: 3000,
+          timerProgressBar: true,
+        })
+      }, 1500)
+    }
+  }
+
+  const handleForwardEmail = async () => {
+    if (!selectedEmailData) return
+
+    const { value: formValues } = await Swal.fire({
+      title: "Forward Email",
+      html: `
+        <div style="text-align: left;">
+          <label for="swal-input1" style="display: block; margin-bottom: 5px; font-weight: bold;">To:</label>
+          <input id="swal-input1" class="swal2-input" placeholder="recipient@example.com" type="email" style="margin-bottom: 15px;">
+          <label for="swal-input2" style="display: block; margin-bottom: 5px; font-weight: bold;">Additional message (optional):</label>
+          <textarea id="swal-input2" class="swal2-textarea" placeholder="Add your message here..."></textarea>
+        </div>
+      `,
+      focusConfirm: false,
+      showCancelButton: true,
+      confirmButtonText: "Forward",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#0d6efd",
+      preConfirm: () => {
+        const email = (document.getElementById("swal-input1") as HTMLInputElement)?.value
+        const message = (document.getElementById("swal-input2") as HTMLTextAreaElement)?.value
+        if (!email) {
+          Swal.showValidationMessage("Please enter recipient email")
+          return false
+        }
+        return { email, message }
+      },
+    })
+
+    if (formValues) {
+      Swal.fire({
+        title: "Forwarding Email...",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading()
+        },
+      })
+
+      setTimeout(async () => {
+        setEmails(
+          emails.map((email) =>
+            email.id === selectedEmailData.id ? { ...email, status: "forwarded" as const } : email,
+          ),
+        )
+
+        await Swal.fire({
+          icon: "success",
+          title: "Email Forwarded!",
+          text: `Email has been forwarded to ${formValues.email}`,
+          confirmButtonColor: "#198754",
+          timer: 3000,
+          timerProgressBar: true,
+        })
+      }, 1500)
+    }
+  }
+
+  const handleAttachFiles = async () => {
+    await Swal.fire({
+      icon: "info",
+      title: "File Attachment",
+      text: "File attachment feature will be available soon!",
+      confirmButtonColor: "#0d6efd",
+    })
+  }
+
+  const handleNewChat = async () => {
+    const { value: email } = await Swal.fire({
+      title: "Start New Conversation",
+      input: "email",
+      inputLabel: "Enter recipient's email address",
+      inputPlaceholder: "recipient@example.com",
+      showCancelButton: true,
+      confirmButtonText: "Start Chat",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#0d6efd",
+      inputValidator: (value) => {
+        if (!value) {
+          return "Please enter an email address"
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          return "Please enter a valid email address"
+        }
+      },
+    })
+
+    if (email) {
+      setComposeForm({ ...composeForm, to: email })
+      setShowComposeModal(true)
+    }
   }
 
   return (
@@ -309,6 +552,8 @@ export default function EmailSystem() {
                         ></i>
                       )}
                       {email.hasAttachments && <i className="bi bi-paperclip text-muted me-1"></i>}
+                      {email.status === "replied" && <i className="bi bi-reply text-success me-1"></i>}
+                      {email.status === "forwarded" && <i className="bi bi-forward text-info me-1"></i>}
                     </div>
                     <div className={`fw-${email.status === "unread" ? "bold" : "normal"} text-truncate mb-1`}>
                       {email.subject}
@@ -379,20 +624,17 @@ export default function EmailSystem() {
                       <i className="bi bi-three-dots-vertical"></i>
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
-                      <Dropdown.Item>
+                      <Dropdown.Item onClick={handleReplyEmail}>
                         <i className="bi bi-reply me-2"></i>Reply
                       </Dropdown.Item>
-                      <Dropdown.Item>
-                        <i className="bi bi-reply-all me-2"></i>Reply All
-                      </Dropdown.Item>
-                      <Dropdown.Item>
+                      <Dropdown.Item onClick={handleForwardEmail}>
                         <i className="bi bi-forward me-2"></i>Forward
                       </Dropdown.Item>
                       <Dropdown.Divider />
-                      <Dropdown.Item>
+                      <Dropdown.Item onClick={() => handleArchiveEmail(selectedEmailData.id)}>
                         <i className="bi bi-archive me-2"></i>Archive
                       </Dropdown.Item>
-                      <Dropdown.Item className="text-danger">
+                      <Dropdown.Item className="text-danger" onClick={() => handleDeleteEmail(selectedEmailData.id)}>
                         <i className="bi bi-trash me-2"></i>Delete
                       </Dropdown.Item>
                     </Dropdown.Menu>
@@ -425,13 +667,10 @@ export default function EmailSystem() {
               {/* Action Buttons */}
               <div className="p-4 border-top bg-light">
                 <div className="d-flex gap-2">
-                  <Button variant="primary">
+                  <Button variant="primary" onClick={handleReplyEmail}>
                     <i className="bi bi-reply me-2"></i>Reply
                   </Button>
-                  <Button variant="outline-primary">
-                    <i className="bi bi-reply-all me-2"></i>Reply All
-                  </Button>
-                  <Button variant="outline-primary">
+                  <Button variant="outline-primary" onClick={handleForwardEmail}>
                     <i className="bi bi-forward me-2"></i>Forward
                   </Button>
                 </div>
@@ -512,7 +751,7 @@ export default function EmailSystem() {
             </Form.Group>
 
             <div className="d-flex align-items-center gap-3">
-              <Button variant="outline-secondary" size="sm">
+              <Button variant="outline-secondary" size="sm" onClick={handleAttachFiles}>
                 <i className="bi bi-paperclip me-1"></i>
                 Attach Files
               </Button>
@@ -530,7 +769,7 @@ export default function EmailSystem() {
             <Button variant="secondary" onClick={() => setShowComposeModal(false)}>
               Cancel
             </Button>
-            <Button variant="outline-secondary">
+            <Button variant="outline-secondary" onClick={handleSaveDraft}>
               <i className="bi bi-file-earmark me-2"></i>
               Save Draft
             </Button>

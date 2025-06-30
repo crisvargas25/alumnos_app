@@ -106,8 +106,8 @@ alumnos-app/
 ## 🧑‍💻 Author
 
 Created with ❤️ by 
-*Cristian Vargas*
-*Daniel Gallegos*
-*Diego Antunez*
-*Karen Vazquez*
-*Natalia Niebla*
+*Cristian Vargas* |
+*Daniel Gallegos* |
+*Diego Antunez* |
+*Karen Vazquez* |
+*Natalia Niebla* |

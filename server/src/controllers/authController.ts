@@ -1,3 +1,4 @@
+
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
@@ -68,7 +69,7 @@ export const googleAuth = async (req: Request, res: Response) => {
       user = new User({
         email,
         nombre: payload?.name || "Usuario Google",
-        enrollmentYear: new Date().getFullYear(), // valor temporal predeterminado
+        enrollmentYear: new Date().getFullYear(), 
         password: "",
         autenticadoPorGoogle: true,
       });

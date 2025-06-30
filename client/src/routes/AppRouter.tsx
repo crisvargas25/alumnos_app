@@ -10,7 +10,7 @@
     import NotFound from "../screens/NotFound.tsx";
     import PrivateRoute from "./PrivateRoute.tsx";
     import Error505 from "../screens/505error.tsx";
-import ContenidoA from "../screens/ContenidoA.tsx";
+    import ContenidoA from "../screens/ContenidoA.tsx";
 
     export default function AppRouter() {
     return (

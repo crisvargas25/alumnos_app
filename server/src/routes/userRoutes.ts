@@ -4,6 +4,6 @@ import { getStudents } from '../controllers/userController';
 
 const router = express.Router();
 
-router.get('/', authMiddleware, getStudents);
+router.get('/', authMiddleware, getStudents );
 
 export default router;

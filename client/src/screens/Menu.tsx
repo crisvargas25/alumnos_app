@@ -1,8 +1,9 @@
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
+import Cookies from 'js-cookie'; 
 
 function Breadcrumbs() {
   const location = useLocation();
@@ -25,6 +26,19 @@ function Breadcrumbs() {
 }
 
 function Menu() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("token");
+    Cookies.remove("token");
+
+    // (Opcional) Mostrar mensaje
+    alert("Sesión finalizada");
+
+    navigate("/login");
+  };
+
   return (
     <Container fluid>
       <Navbar expand="lg" className="bg-body-tertiary">
@@ -42,6 +56,10 @@ function Menu() {
                 <NavDropdown.Item as={Link} to="/alumnos/consultar">Consultar</NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/alumnos/mensajes">Mensajes</NavDropdown.Item>
               </NavDropdown>
+            </Nav>
+
+            <Nav className="ms-auto">
+              <Nav.Link onClick={handleLogout}>Log Out</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>

@@ -16,7 +16,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/alumnos', studentRoutes);
-app.use('/api/messages', messageRoutes);
+app.use('/messages', messageRoutes);
 app.use('/api/users', userRoutes);
 
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/alumnos')

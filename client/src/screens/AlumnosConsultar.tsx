@@ -40,7 +40,7 @@ function AlumnosConsultar() {
 
   const fetchAlumnos = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/alumnos/obtener");
+      const { data } = await axios.get("http://localhost:3001/alumnos/obtener");
       console.log(data.result);
       setAlumnos(Array.isArray(data.result) ? data.result : []);
     } catch (err) {
@@ -52,7 +52,7 @@ function AlumnosConsultar() {
 
   const alumnoConsultar = async (matricula: string) => {
     try {
-      const { data } = await axios.get(`http://localhost:5000/alumnos/getStudent/${matricula}`);
+      const { data } = await axios.get(`http://localhost:3001/alumnos/getStudent/${matricula}`);
       const alumno = data.data;
       if (alumno) {
         setAlumnoSeleccionado(alumno);

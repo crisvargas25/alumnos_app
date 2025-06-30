@@ -58,7 +58,7 @@ function AlumnoModificar() {
             return;
         }
         try {
-            const response = await axios.get(`http://localhost:5000/alumnos/getStudent/${buscarMatricula}`);
+            const response = await axios.get(`http://localhost:3001/alumnos/getStudent/${buscarMatricula}`);
             console.log(response.data);
 
             if (response.data && response.data.data) {
@@ -108,7 +108,7 @@ function AlumnoModificar() {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-            const response = await axios.put(`http://localhost:5000/alumnos/actualizar/${alumno.matricula}`, alumno);
+            const response = await axios.put(`http://localhost:3001/alumnos/actualizar/${alumno.matricula}`, alumno);
             Swal.fire("Éxito", "Alumno actualizado correctamente", "success");
             setAlumno(initialState);
             setBuscarMatricula("");

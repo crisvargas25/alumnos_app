@@ -61,7 +61,7 @@ function AlumnosAgregar() {
         console.log(datos);
         
         const response = await axios.post(
-            "http://localhost:5000/alumnos/agregar", 
+            "http://localhost:3001/alumnos/agregar", 
             datos
         ).then((response) => {
             notify(response.data.status);

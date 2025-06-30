@@ -12,6 +12,7 @@ function Breadcrumbs() {
     "/alumnos/modificar": "Modificar Alumno",
     "/alumnos/eliminar": "Eliminar Alumno",
     "/alumnos/consultar": "Consultar Alumnos",
+    "/alumnos/mensajes": "Mensajes",
   };
 
   const label = breadcrumbMap[location.pathname] || "Página";
@@ -39,6 +40,7 @@ function Menu() {
                 <NavDropdown.Item as={Link} to="/alumnos/eliminar">Eliminar</NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item as={Link} to="/alumnos/consultar">Consultar</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/alumnos/mensajes">Mensajes</NavDropdown.Item>
               </NavDropdown>
             </Nav>
           </Navbar.Collapse>

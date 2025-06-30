@@ -20,7 +20,7 @@ function AlumnoEliminar() {
         }
 
         try {
-            const response = await axios.get(`http://localhost:5000/alumnos/getStudent/${matricula}`);
+            const response = await axios.get(`http://localhost:3001/alumnos/getStudent/${matricula}`);
             if (response.data && response.data.data) {
                 setAlumno(response.data.data);
             } else {
@@ -46,7 +46,7 @@ function AlumnoEliminar() {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await axios.delete(`http://localhost:5000/alumnos/eliminar/${matricula}`);
+                    await axios.delete(`http://localhost:3001/alumnos/eliminar/${matricula}`);
                     Swal.fire("Eliminado", "El alumno ha sido eliminado", "success");
                     setAlumno(null);
                     setMatricula("");

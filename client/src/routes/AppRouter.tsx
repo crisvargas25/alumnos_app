@@ -35,7 +35,7 @@
             <Route path="alumnos/consultar" element={<AlumnosConsultar />} />
             <Route path="alumnos/modificar" element={<AlumnoModificar />} />
             <Route path="alumnos/eliminar" element={<AlumnoEliminar />} />
-            <Route path="mensajes" element={<MessagingPage/>} />
+            <Route path="alumnos/mensajes" element={<MessagingPage/>} />
 
             </Route>
             <Route path="/505" element={<Error505 />} />
